@@ -10,18 +10,21 @@ So what do we have...
 
 In order to rapidly create a testing environment, docker-compose is used. The docker-compose.yaml file will spin up 1 Mysql Database, 1 Kamailio (acting as the SBC), 2 Network Servers, and two PJSUA containers which act as an external B2BUA, representing carrier and an Internal B2BUA, representing a network element of the voice core.
 
-it's easy to spin up the instances, just run docker-compose up
+Before you start, make a directory in the root of this folder named "db"
+
+it's easy to spin up the instances, just run `docker-compose up`
 
 This will start all of the containers.
 
 
 # Database Setup
-Once they are started connect to the database with docker exec -it db01 bash
+Once they are started connect to the database with `docker exec -it db01 bash`
 
-followed by mysql -u root -p at the command line.
+followed by `mysql -u root -p` at the command line.
 
 At the db type "use db" and then create the dnis table
 
+```javascript
 CREATE TABLE dnis(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   KEY_NAME  VARCHAR(64),
@@ -30,20 +33,20 @@ CREATE TABLE dnis(
   KEY_VALUE VARCHAR(16),
   EXPIRES INT
 );
-
+```
 and lets add an entry into the table
-
+```javascript
 insert into dnis (KEY_NAME, KEY_TYPE, VALUE_TYPE,KEY_VALUE,EXPIRES)
 VALUES('8675309', 0, 0, "172.16.10.100", 3600);
-
+```
 Now that a DB entry is written, exit out of the database container.
 
 # Network-Server
 
-Now that the datbase has been populated, you will need to reload the dnis htable on ns01 and ns02 using "kamcmd htable.reload dnis "
+Now that the datbase has been populated, you will need to reload the dnis htable on ns01 and ns02 using `kamcmd htable.reload dnis`
 
 You can verify the contents with kamcmd htable.dump dnis
-
+```javascript
 root@522c7d38f9d2:/# kamcmd htable.dump dnis
 {
 	entry: 12426
@@ -56,3 +59,4 @@ root@522c7d38f9d2:/# kamcmd htable.dump dnis
 		}
 	}
 }
+```
