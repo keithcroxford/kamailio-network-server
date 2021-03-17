@@ -38,6 +38,9 @@ and lets add an entry into the table
 ```javascript
 insert into dnis (KEY_NAME, KEY_TYPE, VALUE_TYPE,KEY_VALUE,EXPIRES)
 VALUES('8675309', 0, 0, "172.16.10.100", 3600);
+
+insert into dnis (KEY_NAME, KEY_TYPE, VALUE_TYPE,KEY_VALUE,EXPIRES)
+VALUES('18001111111', 0, 0, "172.16.10.50", 3600);
 ```
 Now that a DB entry is written, exit out of the database container.
 
