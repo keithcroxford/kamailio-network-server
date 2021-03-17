@@ -21,7 +21,7 @@ Once they are started connect to the database with docker exec -it db01 bash
 followed by mysql -u root -p at the command line.
 
 At the db type "use db" and then create the dnis table
-
+`
 CREATE TABLE dnis(
   id INT(6) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
   KEY_NAME  VARCHAR(64),
@@ -30,12 +30,12 @@ CREATE TABLE dnis(
   KEY_VALUE VARCHAR(16),
   EXPIRES INT
 );
-
+`
 and lets add an entry into the table
-
+`
 insert into dnis (KEY_NAME, KEY_TYPE, VALUE_TYPE,KEY_VALUE,EXPIRES)
 VALUES('8675309', 0, 0, "172.16.10.100", 3600);
-
+`
 Now that a DB entry is written, exit out of the database container.
 
 # Network-Server
@@ -43,7 +43,7 @@ Now that a DB entry is written, exit out of the database container.
 Now that the datbase has been populated, you will need to reload the dnis htable on ns01 and ns02 using "kamcmd htable.reload dnis "
 
 You can verify the contents with kamcmd htable.dump dnis
-
+`
 root@522c7d38f9d2:/# kamcmd htable.dump dnis
 {
 	entry: 12426
@@ -56,7 +56,7 @@ root@522c7d38f9d2:/# kamcmd htable.dump dnis
 		}
 	}
 }
-
+`
 So you can see that we have the dnis of "8765409" with a value of 172.16.10.100 
 
 # Attach to the pjsua instances. 
