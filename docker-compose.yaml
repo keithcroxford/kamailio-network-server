@@ -94,7 +94,7 @@ services:
     command: pjsua --null-audio --no-tcp
     build: .
     ports:
-      - "5091:5060"
+      - "5095:5060"
     networks:
       internal:
         ipv4_address: 172.16.10.50
