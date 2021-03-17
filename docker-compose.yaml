@@ -86,6 +86,20 @@ services:
       internal:
         ipv4_address: 172.16.10.100
 
+  pjsua_internal01:
+    tty: true
+    container_name: pji01
+    stdin_open: true
+    image: andrius/pjsua:latest
+    command: pjsua --null-audio --no-tcp
+    build: .
+    ports:
+      - "5091:5060"
+    networks:
+      internal:
+        ipv4_address: 172.16.10.50
+
+
   pjsua_external:
     tty: true
     container_name: pje
