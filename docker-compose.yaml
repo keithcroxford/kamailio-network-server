@@ -1,0 +1,114 @@
+version: "3.9"  # optional since v1.27.0
+services:
+  db:
+    image: mysql:5.7
+    restart: always
+    container_name: db01
+    environment:
+      MYSQL_DATABASE: 'db'
+      MYSQL_USER: 'user'
+      MYSQL_PASSWORD: 'password'
+      MYSQL_ROOT_PASSWORD: 'password'
+    ports:
+      - '3306:3306'
+    expose:
+      - '3306'
+    volumes:
+      - ./db:/var/lib/mysql
+    networks:
+      internal:
+        ipv4_address: 172.16.10.254
+
+  sbc:
+    image: kamailio/kamailio:5.4.4-buster
+    container_name: sbc01
+    build: .
+    ports:
+      - "5090:5060"
+    volumes:
+      - ./edge-proxy/:/etc/kamailio
+    networks:
+      external:
+        ipv4_address: 192.168.10.2
+      internal:
+        ipv4_address: 172.16.10.2
+
+  ns01:
+    image: kamailio/kamailio:5.4.4-buster
+    container_name: ns01
+    depends_on:
+      - "db"
+    ports:
+      - "6000:5060"
+    environment:
+      - MYNAME=ns01
+      - PEERNAME=172.16.10.102
+      - MYIP=172.16.10.101
+      - DEFAULT_DEST=172.16.10.100
+      - LOCAL_SOCKET=udp:172.16.10.101:5060
+    build: .
+    volumes:
+      - ./network-server/:/etc/kamailio
+    networks:
+      internal:
+        ipv4_address: 172.16.10.101
+
+  ns02:
+    image: kamailio/kamailio:5.4.4-buster
+    container_name: ns02
+    depends_on:
+      - "db"
+    ports:
+      - "6001:5060"
+    environment:
+      - MYNAME=ns02
+      - PEERNAME=172.16.10.101
+      - MYIP=172.16.10.102
+      - DEFAULT_DEST=172.16.10.100
+      - LOCAL_SOCKET=udp:172.16.10.102:5060
+    build: .
+    volumes:
+      - ./network-server/:/etc/kamailio
+    networks:
+      internal:
+        ipv4_address: 172.16.10.102
+
+  pjsua_internal:
+    tty: true
+    container_name: pji
+    stdin_open: true
+    image: andrius/pjsua:latest
+    command: pjsua --null-audio --no-tcp
+    build: .
+    ports:
+      - "5091:5060"
+    networks:
+      internal:
+        ipv4_address: 172.16.10.100
+
+  pjsua_external:
+    tty: true
+    container_name: pje
+    stdin_open: true
+    image: andrius/pjsua:latest
+    command: pjsua --null-audio --no-tcp  --outbound sip:192.168.10.2;lr
+    build: .
+    ports:
+      - "5092:5060"
+    networks:
+      external:
+        ipv4_address: 192.168.10.100
+
+networks:
+    external:
+        # use the bridge driver, but enable IPv6
+        ipam:
+            config:
+                - subnet: 192.168.10.0/24
+                  gateway: 192.168.10.1
+    internal:
+        # use a custom driver, with no options
+        ipam:
+            config:
+                - subnet: 172.16.10.0/24
+                  gateway: 172.16.10.1
